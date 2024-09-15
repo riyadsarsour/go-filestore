@@ -39,6 +39,7 @@ A simple service that to manage plain-text files through an HTTP server and a CL
 The service supports file operations such as storing, updating, deleting files, and performing analysis on the stored files.
 
 ## Components
+```
 go-filestore/
 ├── client/
 │   ├── main.go
@@ -56,6 +57,7 @@ go-filestore/
 │   │   ├── remove.go
 ├── Dockerfile
 └── README.md
+```
 
 ### Server
 
