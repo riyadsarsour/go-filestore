@@ -187,10 +187,17 @@ docker run -d -p 8080:8080 -e FILESTORE_DIR=/your/storage/location --name go-fil
 ### OPTION 2: Kubernetes (validated vie [minikube](https://kubernetes.io/docs/tutorials/kubernetes-basics/create-cluster/cluster-intro/))
 My steps particularly follow use of minikube cluster creation and management (just what i used here for visuals)
 
-```
+```bash 
 minikube start
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
+minikube dashboard
+# AFTER THIS exec into the pod and store cli tool is ready to use
+```
+Below more sets of validation via command line.
+Though I found with minikube service would need to change to a node port rather than load balancer
+
+```bash
 #verify deployments
 kubectl get deployments
 #should see output of 
