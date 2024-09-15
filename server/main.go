@@ -5,6 +5,7 @@ import (
 	"go-filestore/server/handlers"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func main() {
@@ -18,8 +19,22 @@ func main() {
 		handlers.UploadFiles(writer, req, fileStore)
 	})
 
-	http.HandleFunc("/ls", func(writer http.ResponseWriter, req *http.Request) {
+	http.HandleFunc("/list", func(writer http.ResponseWriter, req *http.Request) {
 		handlers.ListFiles(writer, req, fileStore)
+	})
+
+	http.HandleFunc("/remove/", func(writer http.ResponseWriter, req *http.Request) {
+		if req.Method == http.MethodDelete {
+			// Extract file name from URL path
+			fileName := strings.TrimPrefix(req.URL.Path, "/remove/")
+			if fileName == "" {
+				http.Error(writer, "Missing file name", http.StatusBadRequest)
+				return
+			}
+			handlers.RemoveFile(writer, req, fileStore, fileName)
+		} else {
+			http.Error(writer, "Invalid request method", http.StatusMethodNotAllowed)
+		}
 	})
 
 	log.Println("Server starting on :8080...")

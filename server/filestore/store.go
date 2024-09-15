@@ -20,7 +20,7 @@ func (s *FileStore) SaveFilePart(part *multipart.Part) error {
 	filePath := filepath.Join(s.Dir, part.FileName())
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
-		return fmt.Errorf("file already exists")
+		return fmt.Errorf("file already exists: %s", part.FileName())
 	}
 
 	// else save

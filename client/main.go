@@ -9,7 +9,12 @@ import (
 	"strings"
 )
 
-// to add "add" arg
+/* FURTURE TODOS FOR STRCUTURE OF CLIENT
+	-- eventually introduce constant for endpoint to trigger when moving away from local host
+
+END OF DESIGN?STRUCTURE NOTES */
+
+// "add" logic
 func uploadFile(filePath string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -38,28 +43,111 @@ func uploadFile(filePath string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("server returned: %v", resp.Status)
+		errorMessage, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("%s", errorMessage)
 	}
 
 	fmt.Println("File uploaded successfully")
 	return nil
 }
 
+func listFiles() error {
+	resp, err := http.Get("http://localhost:8080/list")
+
+	if err != nil {
+		return fmt.Errorf("failed to list files: %v", err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("server returned: %v", resp.Status)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return fmt.Errorf("failed to read response body: %v", err)
+	}
+
+	// else if all defnesive checks pass we SHOULD have valid list of files
+	fmt.Println("Files Stored:")
+	fmt.Println(string(body))
+	return nil
+}
+
+func removeFile(fileName string) error {
+	req, err := http.NewRequest(http.MethodDelete, "http://localhost:8080/remove/"+fileName, nil)
+
+	if err != nil {
+		return fmt.Errorf("failed to create request: %v", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to remove file: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		errorMessage, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("%s", errorMessage)
+	}
+
+	fmt.Println("File removed successfully")
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: store add <file1> [file2] ...")
+		fmt.Println("Usage: store <command> [options]")
+		fmt.Println("Commands:")
+		fmt.Println(" add <file1> [file2] ...")
+		fmt.Println(" ls")
+		fmt.Println(" remove <file>")
+		fmt.Println(" -h | --help")
 		return
 	}
 
-	if os.Args[1] != "add" {
-		fmt.Println("Unknown command:", os.Args[1])
-		fmt.Println("Usage: store add <file1> [file2] ...")
-		return
-	}
-
-	for _, file := range os.Args[2:] {
-		if err := uploadFile(file); err != nil {
-			fmt.Printf("Error uploading %s: %v\n", file, err)
+	switch os.Args[1] {
+	case "add":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: store add <file1> [file2] ...")
+			return
 		}
+
+		for _, file := range os.Args[2:] {
+			if err := uploadFile(file); err != nil {
+				fmt.Printf("Error uploading: %v\n", file)
+				fmt.Println(err)
+			}
+		}
+	case "ls":
+		if err := listFiles(); err != nil {
+			fmt.Printf("Error listing files: %v\n", err)
+		}
+	case "remove":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: store remove <file>")
+			return
+		}
+		if err := removeFile(os.Args[2]); err != nil {
+			fmt.Printf("Error removing file: %v\n", err)
+		}
+	case "-h", "--help":
+		fmt.Println("Usage: store <command> [options]")
+		fmt.Println("Commands:")
+		fmt.Println("  add <file1> [file2] ...")
+		fmt.Println("  ls")
+		fmt.Println("  remove <file>")
+		fmt.Println("  -h | --help")
+	default:
+		fmt.Println("Unknown command:", os.Args[1])
+		fmt.Println("Usage: store <command> [options]")
+		fmt.Println("Commands:")
+		fmt.Println("  add <file1> [file2] ...")
+		fmt.Println("  ls")
+		fmt.Println("  remove <file>")
+		fmt.Println("  -h | --help")
 	}
 }
