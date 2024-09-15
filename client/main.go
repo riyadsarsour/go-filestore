@@ -98,11 +98,62 @@ func removeFile(fileName string) error {
 	return nil
 }
 
+func updateFile(filePath string) error {
+	file, err := os.Open(filePath)
+
+	if err != nil {
+		return fmt.Errorf("failed to open file: %v\n", err)
+	}
+
+	defer file.Close()
+
+	body := &strings.Builder{}
+	writer := multipart.NewWriter(body)
+
+	part, err := writer.CreateFormFile("file", filePath)
+	if err != nil {
+		return fmt.Errorf("failed to create form file: %v", err)
+	}
+
+	if _, err := io.Copy(part, file); err != nil {
+		return fmt.Errorf("failed to copy file: %v", err)
+	}
+
+	writer.Close()
+
+	req, err := http.NewRequest(http.MethodPut, "http://localhost:8080/update", strings.NewReader(body.String()))
+
+	if err != nil {
+		return fmt.Errorf("failed to create update request: %v", err)
+	}
+
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return fmt.Errorf("failed to update file: %v", err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		errorMessage, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("%s", errorMessage)
+	}
+
+	fmt.Println("File updated successfully")
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: store <command> [options]")
 		fmt.Println("Commands:")
 		fmt.Println(" add <file1> [file2] ...")
+		fmt.Println(" update <file1>")
 		fmt.Println(" ls")
 		fmt.Println(" remove <file>")
 		fmt.Println(" -h | --help")
@@ -122,7 +173,23 @@ func main() {
 				fmt.Println(err)
 			}
 		}
+	case "update":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: store update <file1>")
+			return
+		}
+
+		for _, file := range os.Args[2:] {
+			if err := updateFile(file); err != nil {
+				fmt.Printf("Error updating: %v\n", file)
+				fmt.Println(err)
+			}
+		}
 	case "ls":
+		if len(os.Args) > 2 {
+			fmt.Println("Usage: store ls")
+		}
+
 		if err := listFiles(); err != nil {
 			fmt.Printf("Error listing files: %v\n", err)
 		}
@@ -138,6 +205,7 @@ func main() {
 		fmt.Println("Usage: store <command> [options]")
 		fmt.Println("Commands:")
 		fmt.Println("  add <file1> [file2] ...")
+		fmt.Println("  update <file1>")
 		fmt.Println("  ls")
 		fmt.Println("  remove <file>")
 		fmt.Println("  -h | --help")
@@ -146,6 +214,7 @@ func main() {
 		fmt.Println("Usage: store <command> [options]")
 		fmt.Println("Commands:")
 		fmt.Println("  add <file1> [file2] ...")
+		fmt.Println("  update <file1>")
 		fmt.Println("  ls")
 		fmt.Println("  remove <file>")
 		fmt.Println("  -h | --help")

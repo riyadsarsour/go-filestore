@@ -19,6 +19,10 @@ func main() {
 		handlers.UploadFiles(writer, req, fileStore)
 	})
 
+	http.HandleFunc("/update", func(writer http.ResponseWriter, req *http.Request) {
+		handlers.UpdateFile(writer, req, fileStore)
+	})
+
 	http.HandleFunc("/list", func(writer http.ResponseWriter, req *http.Request) {
 		handlers.ListFiles(writer, req, fileStore)
 	})
