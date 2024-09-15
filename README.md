@@ -15,6 +15,12 @@ The server exposes HTTP endpoints to interact with the file store. It handles re
 
 The CLI client interacts with the server. It supports commands to add, list, remove, update files, and perform operations such as word count and finding the most or least frequent words.
 
+### CURRENT TEMP STATE NOTES 
+
+Currently all files save to filestore directory in repo, however this can be changed in sever/main.go file
+```go
+fileStore := filestore.NewFileStore("YOUR/DESIRED/PATH")
+```
 ## Getting Statrted
 
 1. **Docker**
