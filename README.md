@@ -7,7 +7,7 @@
   - [Components](#components)
     - [Server](#server)
     - [Client](#client)
-    - [CURRENT TEMP STATE NOTES](#current-temp-state-notes)
+    - [PUBLISHED DOCKER HUB IMAGE](#published-docker-hub-image)
   - [Getting Statrted](#getting-statrted)
     - [OPTION 1: **Docker**](#option-1-docker)
       - [default way to run image](#default-way-to-run-image)
@@ -67,11 +67,10 @@ The server exposes HTTP endpoints to interact with the file store. It handles re
 
 The CLI client interacts with the server. It supports commands to add, list, remove, update files, and perform operations such as word count and finding the most or least frequent words.
 
-### CURRENT TEMP STATE NOTES 
-
-Currently all files save to filestore directory in repo, however this can be changed in sever/main.go file
-```go
-fileStore := filestore.NewFileStore("YOUR/DESIRED/PATH")
+### PUBLISHED DOCKER HUB IMAGE
+Docker Image is also pushed part of the repo: https://hub.docker.com/repository/docker/riyadsarsour/go-file-store/general
+```bash
+docker pull riyadsarsour/go-file-store:latest
 ```
 ## Getting Statrted
 
