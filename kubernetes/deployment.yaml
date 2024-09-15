@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-file-store-deployment
+  labels:
+    app: go-file-store
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-file-store
+  template:
+    metadata:
+      labels:
+        app: go-file-store
+    spec:
+      containers:
+      - name: go-file-store
+        image: riyadsarsour/go-file-store:latest
+        ports:
+        - containerPort: 8080
+        env:
+        # path is need for file storage for now
+        # as my current design writes to a reachable directory locally
+        # this deployment for now is not persistent (if pod dies so do files)
+        - name: FILESTORE_DIR
+          value: "/data/filestore"
+        volumeMounts:
+        - name: go-file-store-data
+          mountPath: /data/filestore
+      volumes:
+      - name: go-file-store-data
+        emptyDir: {}
