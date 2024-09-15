@@ -23,10 +23,10 @@ fileStore := filestore.NewFileStore("YOUR/DESIRED/PATH")
 ```
 ## Getting Statrted
 
-1. **Docker**
-   WORKING ON DOCKER IMAGE TO DOCKERHUB PLUS KUBERNETES DEPLOYMENT
+### OPTION !: **Docker**
+ WORKING ON DOCKER IMAGE TO DOCKERHUB PLUS KUBERNETES DEPLOYMENT
 
-2. **Clone the Repository**
+### OPTION 2: Locally Cloning the Repository
 ### Server
 
 CD to the server directory and build the server:
