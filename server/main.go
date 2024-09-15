@@ -41,6 +41,10 @@ func main() {
 		}
 	})
 
+	http.HandleFunc("/wordcount", func(writer http.ResponseWriter, req *http.Request) {
+		handlers.WordCount(writer, req, fileStore)
+	})
+
 	log.Println("Server starting on :8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

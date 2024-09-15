@@ -148,12 +148,30 @@ func updateFile(filePath string) error {
 	return nil
 }
 
+func wordCount() error {
+	resp, err := http.Get("http://localhost:8080/wordcount")
+	if err != nil {
+		return fmt.Errorf("failed to get word count: %v", err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("server returned:\n%v", resp.Status)
+	}
+
+	body, _ := io.ReadAll(resp.Body)
+	fmt.Println(string(body))
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: store <command> [options]")
 		fmt.Println("Commands:")
 		fmt.Println(" add <file1> [file2] ...")
 		fmt.Println(" update <file1>")
+		fmt.Println(" wc")
 		fmt.Println(" ls")
 		fmt.Println(" remove <file>")
 		fmt.Println(" -h | --help")
@@ -187,7 +205,8 @@ func main() {
 		}
 	case "ls":
 		if len(os.Args) > 2 {
-			fmt.Println("Usage: store ls")
+			fmt.Println("Too many args..\nUsage: store ls")
+			return
 		}
 
 		if err := listFiles(); err != nil {
@@ -195,17 +214,26 @@ func main() {
 		}
 	case "remove":
 		if len(os.Args) < 3 {
-			fmt.Println("Usage: store remove <file>")
+			fmt.Println("Too little Args\nUsage: store remove <file>")
 			return
 		}
 		if err := removeFile(os.Args[2]); err != nil {
 			fmt.Printf("Error removing file: %v\n", err)
+		}
+	case "wc":
+		if len(os.Args) > 2 {
+			fmt.Println("Too many args..\nUsage: store wc")
+			return
+		}
+		if err := wordCount(); err != nil {
+			fmt.Printf("Error getting word count: %v\n", err)
 		}
 	case "-h", "--help":
 		fmt.Println("Usage: store <command> [options]")
 		fmt.Println("Commands:")
 		fmt.Println("  add <file1> [file2] ...")
 		fmt.Println("  update <file1>")
+		fmt.Println("  wc")
 		fmt.Println("  ls")
 		fmt.Println("  remove <file>")
 		fmt.Println("  -h | --help")
@@ -215,6 +243,7 @@ func main() {
 		fmt.Println("Commands:")
 		fmt.Println("  add <file1> [file2] ...")
 		fmt.Println("  update <file1>")
+		fmt.Println("  wc")
 		fmt.Println("  ls")
 		fmt.Println("  remove <file>")
 		fmt.Println("  -h | --help")

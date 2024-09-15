@@ -1,0 +1,25 @@
+## Supported Commands
+
+### Commands in Support but need revisit ideas on design
+
+#### Word Count: `store wc`
+
+Returns the total number of words in all files stored in the server.
+
+#### Example:
+
+#### Frequent Words: `store freq-words [--limit|-n 10] [--order=dsc|asc]`
+
+Returns the most or least frequent words in all files stored in the server.
+
+##### Options:
+
+- `--limit | -n <number>`: Limits the number of results (default: 10).
+- `--order <asc|dsc>`: Sorts the result in ascending or descending order (default: `dsc`).
+
+##### Server Response:
+
+## Tradeoffs & Performance TODO Revisit
+
+- **Word Count**: The current implementation reads each file sequentially and counts words. This could be slow for large files, but we optimized it using parallel processing.
+- **Frequent Words**: Sorting by frequency is handled by the server. For large datasets, this could be memory-intensive, and future enhancements may include using a database or distributed file system.
