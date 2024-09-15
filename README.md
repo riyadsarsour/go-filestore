@@ -19,7 +19,8 @@
       - [Word Count](#word-count)
       - [Frequent Words:](#frequent-words)
         - [Options:](#options)
-    - [OPTION 2: Locally Cloning the Repository](#option-2-locally-cloning-the-repository)
+    - [OPTION 2: Kubernetes (validated vie minikube)](#option-2-kubernetes-validated-vie-minikube)
+    - [OPTION 3: Locally Cloning the Repository](#option-3-locally-cloning-the-repository)
     - [Server](#server-1)
     - [CLI Client](#cli-client)
   - [Commands and Usages](#commands-and-usages)
@@ -55,6 +56,9 @@ go-filestore/
 │   ├── filestore/
 │   │   ├── store.go
 │   │   ├── remove.go
+├── kubernetes/
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
 ├── Dockerfile
 └── README.md
 ```
@@ -180,8 +184,31 @@ docker run -d -p 8080:8080 -e FILESTORE_DIR=/your/storage/location --name go-fil
    curl -X GET "http://localhost:8080/freq-words?n=10&order=dsc"
    ```
 
+### OPTION 2: Kubernetes (validated vie minikube)
+My steps particularly follow use of minikube cluster creation and management (just what i used here for visuals)
 
-### OPTION 2: Locally Cloning the Repository
+```
+minikube start
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+#verify deployments
+kubectl get deployments
+#should see output of 
+<!-- NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+go-file-store-deployment   1/1     1            1           15m -->
+
+kubectl get pods
+# should see pod hash 
+<!-- NAME                                        READY   STATUS    RESTARTS   AGE
+go-file-store-deployment-5f684fc976-s5txs   1/1     Running   0          16m -->
+
+#verify services
+minikube service file-store-service
+kubectl describe pod go-file-store-YOUR_HASH
+# monitor logs
+kubectl logs <pod-name>
+```
+### OPTION 3: Locally Cloning the Repository
 ### Server
 
 CD to the server directory and build the server:
