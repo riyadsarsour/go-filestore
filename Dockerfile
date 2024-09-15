@@ -1,25 +1,26 @@
-FROM golang:1.20-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
-# Copy the Go modules manifest and install dependencies
-COPY go.mod go.sum ./
-RUN go mod download
 
-# Copy the rest of the application
 COPY . .
+# run builds
+RUN go build -o store ./client/main.go
+RUN go build -o server ./server/main.go
 
-# build
-RUN go build -o filestore ./server/main.go
 
+#setup runtime env
 FROM alpine:latest
-
-# directory for the file store inside the container
-# I could eventually do away with this but for now serves poc 
-RUN mkdir -p /filestore
-
+RUN apk --no-cache add ca-certificates
 WORKDIR /app
-# copy binary over
-COPY --from=builder /app/filestore /app/filestore
+# copy over builds
+COPY --from=builder /app/store /usr/local/bin/store
+COPY --from=builder /app/server /usr/local/bin/server
+
+# dir for file storage
+RUN mkdir -p /data/filestore
+# FOR NOW design sets up folder as where to store files
+ENV FILESTORE_DIR=/data/filestore
 EXPOSE 8080
-# run the appl
-CMD ["./filestore"]
+
+# run the server 
+ENTRYPOINT ["/usr/local/bin/server/main"]

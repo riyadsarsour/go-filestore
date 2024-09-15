@@ -214,7 +214,7 @@ func main() {
 		fmt.Println(" wc")
 		fmt.Printf(" freq-words [--limit|-n 10] [--order=dsc|")
 		fmt.Println(" ls")
-		fmt.Println(" remove <file>")
+		fmt.Println(" rm <file>")
 		fmt.Println(" -h | --help")
 		return
 	}
@@ -253,9 +253,9 @@ func main() {
 		if err := listFiles(); err != nil {
 			fmt.Printf("Error listing files: %v\n", err)
 		}
-	case "remove":
+	case "rm":
 		if len(os.Args) < 3 {
-			fmt.Println("Too little Args\nUsage: store remove <file>")
+			fmt.Println("Too little Args\nUsage: store rm <file>")
 			return
 		}
 		if err := removeFile(os.Args[2]); err != nil {
@@ -299,7 +299,7 @@ func main() {
 		fmt.Println("  wc")
 		fmt.Println("  ls")
 		fmt.Println("  freq-words [--limit|-n 10] [--order=dsc|")
-		fmt.Println("  remove <file>")
+		fmt.Println("  rm <file>")
 		fmt.Println("  -h | --help")
 	default:
 		fmt.Println("Unknown command:", os.Args[1])
@@ -310,7 +310,7 @@ func main() {
 		fmt.Println("  wc")
 		fmt.Println("  freq-words [--limit|-n 10] [--order=dsc|asc]")
 		fmt.Println("  ls")
-		fmt.Println("  remove <file>")
+		fmt.Println("  rm <file>")
 		fmt.Println("  -h | --help")
 	}
 }
