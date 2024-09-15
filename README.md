@@ -184,7 +184,7 @@ docker run -d -p 8080:8080 -e FILESTORE_DIR=/your/storage/location --name go-fil
    curl -X GET "http://localhost:8080/freq-words?n=10&order=dsc"
    ```
 
-### OPTION 2: Kubernetes (validated vie minikube)
+### OPTION 2: Kubernetes (validated vie [minikube](https://kubernetes.io/docs/tutorials/kubernetes-basics/create-cluster/cluster-intro/))
 My steps particularly follow use of minikube cluster creation and management (just what i used here for visuals)
 
 ```
@@ -194,13 +194,13 @@ kubectl apply -f service.yaml
 #verify deployments
 kubectl get deployments
 #should see output of 
-<!-- NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
-go-file-store-deployment   1/1     1            1           15m -->
+# NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+# go-file-store-deployment   1/1     1            1           15m 
 
 kubectl get pods
 # should see pod hash 
-<!-- NAME                                        READY   STATUS    RESTARTS   AGE
-go-file-store-deployment-5f684fc976-s5txs   1/1     Running   0          16m -->
+# NAME                                        READY   STATUS    RESTARTS   AGE
+# go-file-store-deployment-5f684fc976-s5txs   1/1     Running   0          16m 
 
 #verify services
 minikube service file-store-service
