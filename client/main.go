@@ -1,11 +1,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -165,6 +167,44 @@ func wordCount() error {
 	return nil
 }
 
+func getFreqWords(limit int, order string) error {
+
+	req, err := http.NewRequest("GET", "http://localhost:8080/freq-words", nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %v", err)
+	}
+
+	query := req.URL.Query()
+	if limit > 0 {
+		query.Add("limit", strconv.Itoa(limit))
+	}
+	if order != "" {
+		query.Add("order", order)
+	}
+	// eh right practice
+	req.URL.RawQuery = query.Encode()
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to get freq-words: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("server returned: %v", resp.Status)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body: %v", err)
+	}
+
+	fmt.Println("Frequent Words:")
+	fmt.Println(string(body))
+
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: store <command> [options]")
@@ -172,6 +212,7 @@ func main() {
 		fmt.Println(" add <file1> [file2] ...")
 		fmt.Println(" update <file1>")
 		fmt.Println(" wc")
+		fmt.Printf(" freq-words [--limit|-n 10] [--order=dsc|")
 		fmt.Println(" ls")
 		fmt.Println(" remove <file>")
 		fmt.Println(" -h | --help")
@@ -228,6 +269,28 @@ func main() {
 		if err := wordCount(); err != nil {
 			fmt.Printf("Error getting word count: %v\n", err)
 		}
+	case "freq-words":
+		limit := flag.Int("limit", 10, "Limit for the number of frequent words")
+		flag.IntVar(limit, "n", 10, "Limit for the number of frequent words (short form)")
+
+		order := flag.String("order", "dsc", "Order for frequent words, 'asc' or 'dsc' (default: dsc)")
+
+		flag.CommandLine.Parse(os.Args[2:])
+
+		if *limit <= 0 {
+			fmt.Println("Error: Invalid value for --limit or -n. It must be a positive integer.")
+			return
+		}
+
+		if *order != "asc" && *order != "dsc" {
+			fmt.Println("Error: Invalid value for --order. Use 'asc' or 'dsc'.")
+			return
+		}
+
+		if err := getFreqWords(*limit, *order); err != nil {
+			fmt.Printf("Error fetching frequent words: %v\n", err)
+		}
+
 	case "-h", "--help":
 		fmt.Println("Usage: store <command> [options]")
 		fmt.Println("Commands:")
@@ -235,6 +298,7 @@ func main() {
 		fmt.Println("  update <file1>")
 		fmt.Println("  wc")
 		fmt.Println("  ls")
+		fmt.Println("  freq-words [--limit|-n 10] [--order=dsc|")
 		fmt.Println("  remove <file>")
 		fmt.Println("  -h | --help")
 	default:
@@ -244,6 +308,7 @@ func main() {
 		fmt.Println("  add <file1> [file2] ...")
 		fmt.Println("  update <file1>")
 		fmt.Println("  wc")
+		fmt.Println("  freq-words [--limit|-n 10] [--order=dsc|asc]")
 		fmt.Println("  ls")
 		fmt.Println("  remove <file>")
 		fmt.Println("  -h | --help")

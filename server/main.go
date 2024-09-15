@@ -45,6 +45,10 @@ func main() {
 		handlers.WordCount(writer, req, fileStore)
 	})
 
+	http.HandleFunc("/freq-words", func(writer http.ResponseWriter, req *http.Request) {
+		handlers.FrequentWords(writer, req, fileStore)
+	})
+
 	log.Println("Server starting on :8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
