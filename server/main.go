@@ -5,6 +5,7 @@ import (
 	"go-filestore/server/handlers"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -12,7 +13,12 @@ func main() {
 	// need to revisit how i want to store files,
 	// for now to running http server and verifying client usage this suffices
 	// point for follow up in design talk
-	fileStore := filestore.NewFileStore("./filestore")
+	storageDir := os.Getenv("FILESTORE_DIR")
+	if storageDir == "" {
+		storageDir = "./filestore" // Default directory
+	}
+
+	fileStore := filestore.NewFileStore(storageDir)
 
 	//  defining endpoints
 	http.HandleFunc("/add", func(writer http.ResponseWriter, req *http.Request) {
