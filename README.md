@@ -39,6 +39,23 @@ A simple service that to manage plain-text files through an HTTP server and a CL
 The service supports file operations such as storing, updating, deleting files, and performing analysis on the stored files.
 
 ## Components
+go-filestore/
+├── client/
+│   ├── main.go
+├── server/
+│   ├── main.go
+│   ├── handlers/
+│   │   ├── freq_words.go
+│   │   ├── upload.go
+│   │   ├── list_files.go
+│   │   ├── remove_file.go
+│   │   └── update_file.go
+│   │   ├── word_count.go
+│   ├── filestore/
+│   │   ├── store.go
+│   │   ├── remove.go
+├── Dockerfile
+└── README.md
 
 ### Server
 
@@ -125,7 +142,7 @@ docker run -d -p 8080:8080 -e FILESTORE_DIR=/your/storage/location --name go-fil
 
    
 4. Interacting with Service via REST API
-   ***ADD FILES**
+   **ADD FILES**
    ```bash
    ccurl -X POST http://localhost:8080/add \
      -F "files=@file1.txt" \
@@ -135,7 +152,7 @@ docker run -d -p 8080:8080 -e FILESTORE_DIR=/your/storage/location --name go-fil
    ```
    Files successfully uploaded
    ```
-   ***List Files**
+   **List Files**
    ```bash
    curl -X GET http://localhost:8080/list
    ```
@@ -144,20 +161,20 @@ docker run -d -p 8080:8080 -e FILESTORE_DIR=/your/storage/location --name go-fil
    file1.txt
    file2.txt
    ```
-   *** Remove a File**
+   **Remove a File**
    ```bash
    curl -X DELETE http://localhost:8080/remove/file1.txt
    ```
-   *** Update a File**
+   **Update a File**
    ```bash 
    curl -X PUT http://localhost:8080/update -F "file=@file.txt"
    ```
-   *** Word Count**
+   **Word Count**
    ```bash
    curl -X GET http://localhost:8080/wordcount
    ```
 
-   *** Frequent Words**
+   **Frequent Words**
    ```bash
    curl -X GET "http://localhost:8080/freq-words?n=10&order=dsc"
    ```
@@ -240,6 +257,6 @@ Returns the most or least frequent words in all files stored in the server.
 
 ## Tradeoffs & Performance TODO Revisit
 
-- **adding files**: Explore using hashing of content to see if new file's content already exists in another folder. Could help reduce redundant data transfers. Thouugh this will bring about complexity when handling file updates and this could be further explored with versioning.
+- **Adding Files**: Explore using hashing of content to see if new file's content already exists in another folder. Could help reduce redundant data transfers. Thouugh this will bring about complexity when handling file updates and this could be further explored with versioning.
 - **Word Count**: The current implementation reads each file sequentially and counts words. This could be slow for large files, but can be optimized using parallel processing.
 - **Frequent Words**: Sorting by frequency is handled on the server. This process could be memory-intensive, and future optimizing could include using a database or distributed file system.
